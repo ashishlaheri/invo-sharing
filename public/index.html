@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invo Sharing</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 40px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input[type="file"] {
+      margin-bottom: 15px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #2980b9;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e6a94;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      word-break: break-all;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Invo Sharing</h1>
+    <h2>Upload a File to Azure</h2>
+    
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" name="file" required>
+      <button type="submit">Upload</button>
+    </form>
+
+    <h2>Files in Storage:</h2>
+    <ul id="fileList"></ul>
+  </div>
+
+  <script>
+  document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    alert(await response.text());
+    loadFiles();
+  });
+
+  async function loadFiles() {
+    const response = await fetch('/files');
+    const files = await response.json();
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
+
+    files.forEach(file => {
+      const li = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = file.url;
+      link.textContent = file.name;
+      link.target = '_blank'; // opens in new tab
+      li.appendChild(link);
+      fileList.appendChild(li);
+    });
+  }
+
+  loadFiles();
+</script>
+
+</body>
+</html>
